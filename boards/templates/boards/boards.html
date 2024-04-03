@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+
+
+
+
+<div class="mb-10 w-full flex justify-center">
+  <button
+    class="rounded-full px-20 py-2  border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-white duration-300  "
+    hx-get="{% url 'boards:create_board' %}" hx-swap="outerHTML" hx-target="#placeholder" @click="formOpen=false"> <svg
+      xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+      class="w-6 h-6">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+    </svg>
+  </button>
+</div>
+
+<div x-data="{formOpen:true}" x-show="formOpen" id="placeholder">
+
+</div>
+
+<div class=" flex  justify-center flex-wrap">
+  {% for board in boards %}
+
+  <div class="max-w-sm rounded overflow-hidden shadow-lg">
+    <div class="px-6 py-4">
+      <div class="font-bold text-xl mb-2">{{board.name}}</div>
+      <p class="text-gray-700 text-base">
+        {{board.description}}
+      </p>
+    </div>
+    <div class="px-6 pt-4 pb-2">
+      <a class="inline-block bg-green-500 rounded-full px-3 py-1 text-sm font-semibold text-gray-800 mr-2 mb-2"
+        href="{{ board.get_absolute_url }}" hx-swap="outerHTML">View Details</a>
+      <button class="inline-block bg-red-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-2"
+        hx-post="{% url 'boards:delete_board' board.uuid %}" hx-confirm="Are you sure want to delete">Delete</button>
+
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{% endblock %}

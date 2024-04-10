@@ -1,18 +1,26 @@
 
 from django.http import HttpResponse, HttpResponseBadRequest
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 from django.db import models
 from django.db.models import Case, F, When
 from django.views.decorators.http import require_POST
 from django.contrib.auth.models import User
-from boards.forms import BoardForm, ListForm, ListMoveForm, TaskForm, TaskMoveForm
-
+from boards.forms import BoardForm, ListForm, ListMoveForm, TaskDescForm, TaskForm, TaskMoveForm, RegisterForm
 from boards.models import Board, List, Task
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login
+from django.db.models import Q
 
 @login_required
 def boards(request):
+    query = request.GET.get("q")
+    fill = request.GET.get("f")
     boards = Board.objects.all()
+    if query:
+        boards  = Board.objects.filter(
+            Q(name__icontains=query) | Q(description__icontains=query)
+        )
+
     return render(request, "boards/boards.html", {"boards": boards})
 
 @login_required
@@ -37,6 +45,7 @@ def board(request, board_uuid, partial=False):
     response = render(request, template, {"board": board})
     response["HX-Retarget"] = "#board"
     return response
+
 
 def delete_board(request, board_uuid):
     board = get_object_or_404(Board, uuid=board_uuid)
@@ -151,14 +160,55 @@ def task_move(request, board_uuid):
 
 
 
-
+@login_required
 def task_modal(request, task_uuid):
     task = get_object_or_404(Task.objects.select_related("list"), uuid=task_uuid)
     users = User.objects.all()
     form = TaskForm(request.POST or None, instance=task)
-
-    if request.method == "POST" and form.is_valid():
-        task = form.save()
+    is_manager = request.user.groups.filter(name="Manager").exists() 
+    if request.method == "POST":
+        if is_manager :
+            form = TaskForm(request.POST, instance=task)
+        else:
+            form  = TaskDescForm(request.POST, instance=task)
+        if form.is_valid():
+            task = form.save()
+            print(task.time_estimate)
         return HttpResponse(status=204, headers={"HX-Refresh": "true"})
 
+
+    if request.method =="DELETE":
+        task.delete()
+        return HttpResponse(status=204, headers={"HX-Refresh": "true"})
     return render(request, "boards/task_modal.html", {"task": task, "form": form, "users": users, })
+    
+
+def signup(request):
+    # get user creation form and render it
+    form = RegisterForm()
+    if request.method == 'POST':
+        # get the form with the data
+        form = RegisterForm(request.POST)
+        print(form.errors)
+        # check if the form is valid
+        if form.is_valid():
+            # save the form
+            print(form.cleaned_data)
+            user = form.save()
+            print(user)
+            # login the user
+            login(request, user)
+            return redirect('boards:boards')
+    return render(request, 'boards/signup.html', {'form': form})
+
+
+@require_POST
+def delete_task(request, task_uuid):
+    task = get_object_or_404(Task, uuid=task_uuid)
+    board_uuid = task.list.board.uuid
+
+    if request.method == "POST":
+        task.delete()
+
+    refresh_url = reverse("boards:board", kwargs={"board_uuid": board_uuid})
+    return HttpResponse(status=204, headers={"HX-Redirect": refresh_url})

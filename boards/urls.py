@@ -34,4 +34,6 @@ urlpatterns = [
     ),
     path("<uuid:board_uuid>/list_move", views.list_move, name="list_move"),
     path("<uuid:board_uuid>/task_move", views.task_move, name="task_move"),
+    path("signup", views.signup, name="signup"),
+    path("<uuid:board_uuid>/<uuid:task_uuid>/delete_task", views.delete_task, name="task_delete"),
 ]

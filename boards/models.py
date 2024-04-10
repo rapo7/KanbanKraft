@@ -11,6 +11,7 @@ import uuid
 
 class Board(models.Model):
     name = models.CharField("Name", max_length=255)
+    description = models.TextField("Description", blank=True)
     uuid = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
 
     def get_absolute_url(self):
@@ -47,7 +48,7 @@ class Task(models.Model):
     assigned_to = models.ForeignKey(
         User, on_delete=models.SET_NULL, null=True, blank=True
     )
-    time_estimate = models.DateTimeField(default = datetime.now() + timedelta(days=1), null=True, blank=True)
+    time_estimate = models.DateTimeField(default = datetime.now() + timedelta(days=1), null=True)
 
     def __str__(self) -> str:
         return self.label

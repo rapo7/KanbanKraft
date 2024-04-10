@@ -3,12 +3,15 @@ from django import forms
 
 from django.contrib.auth.models import User
 from boards.models import Board, List, Task
-
+from django.contrib.auth.forms import UserCreationForm
 
 class BoardForm(forms.ModelForm):
+    name = forms.CharField(max_length=255)
+    description = forms.CharField(widget=forms.Textarea, empty_value="Add your description")
     class Meta:
         model = Board
-        fields = ["name"]
+        fields = ["name", "description"]
+        
 
 
 class ListForm(forms.ModelForm):
@@ -17,12 +20,22 @@ class ListForm(forms.ModelForm):
         fields = ["name"]
 
 class TaskForm(forms.ModelForm):
+    label = forms.CharField(widget=forms.Textarea, required=False)
+    description = forms.CharField(widget=forms.Textarea)
+    assigned_to = forms.ModelChoiceField(queryset=User.objects.all(), required=False)
+    # add default value for time_estimate to be 1 day from now
+    time_estimate = forms.DateTimeField(widget=forms.DateTimeInput(attrs={"type": "datetime-local"}), required=False)
     class Meta:
         model = Task
         fields = ["label", "description", "assigned_to", "time_estimate"]
-        widgets = {
-            'time_estimate':forms.TextInput(attrs={'type':'datetime-local'}),
-        }
+
+
+class TaskDescForm(forms.ModelForm):
+    description = forms.CharField(widget=forms.Textarea)
+    class Meta:
+        model = Task
+        fields = ["description"]
+
 
 class TypedMultipleField(forms.TypedMultipleChoiceField):
     def __init__(self, *args, coerce, **kwargs):
@@ -42,3 +55,11 @@ class TaskMoveForm(forms.Form):
 
 class ListMoveForm(forms.Form):
     list_uuids = TypedMultipleField(coerce=uuid.UUID)
+
+
+class RegisterForm(UserCreationForm):
+    email = forms.EmailField()
+
+    class Meta:
+        model = User
+        fields = ["username", "email", "password1", "password2"]

@@ -1,14 +1,22 @@
 {% load widget_tweaks %}
 
-<form  hx-post="{{ request.path }}">
-    <div  class="form bg-white shadow rounded-md p-4 inline-block">
+<form hx-post="{{ request.path }}">
+    <div class="form flex bg-white shadow rounded-md p-4 flex-col">
         {% render_field form.name placeholder="Name" class="rounded" autofocus="true" %}
-        {% render_field form.label placeholder="Text" class="rounded w-full resize-none text-sm" autofocus="true" rows="1" %}
+        {% render_field form.label placeholder="Text" class="rounded w-full resize-none text-sm" rows="1" %}
 
-        <div class="mt-4 flex items-center space-x-4">
+        {% render_field form.description placeholder="Add Your description" class="rounded" autofocus="true" %}
+        <div class="mt-4  items-center space-x-4">
             <button class="bg-green-500 hover:bg-green-600 text-white font-semibold text-xs px-3 py-2 rounded-md"
                 type="submit">
                 Save
+            </button>
+            <button type="button" title="Abbrechen" @click="formOpen=false"
+                class="text-sm text-gray-500 hover:text-gray-700 rounded-full p-1">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
             </button>
         </div>
     </div>

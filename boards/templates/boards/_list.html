@@ -1,3 +1,4 @@
+{% load is_manager %}
 <div class="list w-64 bg-slate-200 rounded-md px-3 pt-1 pb-3 shrink-0" id="{{ list.uuid }}">
     <div class="list-handle cursor-grab flex items-center justify-between">
         <h2 class="text-center text-sm font-bold">
@@ -5,7 +6,6 @@
             <span class="inline-block text-xs bg-slate-100 px-1.5 py-0.5 rounded font-normal ml-1">{{ list.tasks.count}}</span>
         </h2>
 
-        {% comment %} three dot menu {% endcomment %}
         <div x-data="{open: false}" class="relative">
             <button type="button" @click="open=!open" class="text-gray-500 hover:bg-slate-300 p-2 -mr-2 rounded">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
@@ -28,7 +28,7 @@
         {% include "boards/_task.html" %}
         {% endfor %}
     </div>
-
+    {% if request.user|is_manager %}
     <div x-data="{open: false}" @keydown.escape.window="open=false">
         <button type="button"
             class="create-task-button text-sm text-gray-600 px-3 py-2 rounded-md hover:bg-slate-300 w-full text-left"
@@ -57,6 +57,7 @@
             </div>
         </form>
     </div>
+    {% endif %}
 
 
 </div>

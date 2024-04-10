@@ -1,15 +1,27 @@
 {% extends 'base.html' %}
+{% load is_manager %}
 
 {% block content %}
 
 
 
+<form method="get" class="flex items-center p-6 space-x-6 bg-white rounded-xl mb-4 outline-1 outline-green-500">
+  <div class="flex flex-auto bg-gray-100 p-4 w-72 space-x-4 rounded-lg focus-within:text-green-500">
+    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+    </svg>
+    <input name="q" class="bg-gray-100 outline-none  flex-auto "  type="text" placeholder="Article name or keyword..." />
+  </div>
+  <button type="submit" class="bg-green-500 py-3 px-5 text-white font-semibold rounded-lg hover:shadow-lg transition duration-3000 ">
+    <span>Search</span>
+  </button>
+</form>
 
-
+{% if request.user|is_manager %}
 <div class="mb-10 w-full flex justify-center">
   <button
     class="rounded-full px-20 py-2  border-2 border-green-500 text-green-500 hover:bg-green-500 hover:text-white duration-300  "
-    hx-get="{% url 'boards:create_board' %}" hx-swap="outerHTML" hx-target="#placeholder" @click="formOpen=false"> <svg
+    hx-get="{% url 'boards:create_board' %}" hx-swap="innerHTML" hx-target="#placeholder" @click="formOpen=true"> <svg
       xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
       class="w-6 h-6">
       <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
@@ -17,14 +29,15 @@
   </button>
 </div>
 
-<div x-data="{formOpen:true}" x-show="formOpen" id="placeholder">
+<div x-data="{formOpen:true}" x-show="formOpen" class="w-full flex justify-center" id="placeholder">
 
 </div>
+{% endif %}
 
-<div class=" flex  justify-center flex-wrap">
+<div id="filtered" class=" flex  justify-center flex-wrap">
   {% for board in boards %}
-
-  <div class="max-w-sm rounded overflow-hidden shadow-lg">
+  {% if request.user|is_manager %}
+  <div class="w-72 rounded overflow-hidden shadow-lg">
     <div class="px-6 py-4">
       <div class="font-bold text-xl mb-2">{{board.name}}</div>
       <p class="text-gray-700 text-base">
@@ -34,11 +47,25 @@
     <div class="px-6 pt-4 pb-2">
       <a class="inline-block bg-green-500 rounded-full px-3 py-1 text-sm font-semibold text-gray-800 mr-2 mb-2"
         href="{{ board.get_absolute_url }}" hx-swap="outerHTML">View Details</a>
+      
       <button class="inline-block bg-red-500 rounded-full px-3 py-1 text-sm font-semibold text-white mr-2 mb-2"
         hx-post="{% url 'boards:delete_board' board.uuid %}" hx-confirm="Are you sure want to delete">Delete</button>
-
     </div>
   </div>
+  {% else %}
+  <div class="w-72 rounded overflow-hidden shadow-lg">
+    <div class="px-6 py-4">
+      <div class="font-bold text-xl mb-2">{{board.name}}</div>
+      <p class="text-gray-700 text-base">
+        {{board.description}}
+      </p>
+    </div>
+    <div class="px-6 pt-4 pb-2">
+      <a class="inline-block bg-green-500 rounded-full px-3 py-1 text-sm font-semibold text-gray-800 mr-2 mb-2"
+        href="{{ board.get_absolute_url }}" hx-swap="outerHTML">View Details</a>
+    </div>
+  </div>
+  {%endif%}
   {% endfor %}
 </div>
 {% endblock %}

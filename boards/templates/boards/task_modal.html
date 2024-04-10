@@ -1,4 +1,5 @@
 {% load widget_tweaks %}
+{% load is_manager %}
 
 
 <div x-data="{modalOpen: true}" class="modal">
@@ -6,13 +7,17 @@
         <div class="fixed inset-0 bg-gray-500 bg-opacity-25 transition-opacity"></div>
         <div class="fixed z-10 inset-0 overflow-y-auto">
             <div class="flex items-start justify-center min-h-full p-4 text-center sm:p-0">
-                <div class="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 max-w-2xl w-full sm:p-6 min-h-[30rem]"
+                <div class="relative bg-white rounded-lg px-4 pt-5 pb-4 text-left overflow-hidden shadow-xl transform transition-all sm:my-8 max-w-2xl w-full sm:p-6 min-h-[50rem]"
                         x-trap.noscroll.inert="modalOpen" @click.outside="modalOpen=false" x-show="modalOpen">
 
                     <form hx-post="{{ request.path }}" hx-target="closest .modal">
 
                         <div class="flex items-start justify-between mb-2">
-                            {% render_field form.label class="text-xl font-semibold flex-1 border-none p-0 w-full resize-none" rows="1" %}
+                            {% if request.user|is_manager %}
+                            {% render_field form.label class="text-xl font-semibold flex-1 border-none p-0 w-full resize-none" rows="1"  %}
+                            {% else %}
+                            {{task.label}}
+                            {% endif %}
 
                             <button type="button" @click="modalOpen=false" class="text-gray-500 hover:bg-gray-200 rounded-full p-2 -mt-2 -mr-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -27,16 +32,34 @@
                         {% render_field form.description class="text-sm border-gray-200 w-full rounded resize-none" rows="2" %}
 
                         <label class="text-sm text-gray-700 mb-1">assigned_to</label>
+                        {% if request.user|is_manager %}
                         {% render_field form.assigned_to class="text-sm border-gray-200 w-full rounded resize-none" rows="2" %}
+                        {% else %}
+                        {{task.assigned_to}}
+                        {% endif %}
 
                         <label class="text-sm text-gray-700 mb-1">Due Date</label>
+                        {% if request.user|is_manager %}
                         {% render_field form.time_estimate class="text-sm border-gray-200 w-full rounded resize-none" rows="2" %}
+                        {% else %}
+                        {{task.time_estimate}}
+                        {% endif %}
 
                         <div class="mt-4">
                             <button class="bg-green-500 rounded-full py-1.5 px-4 hover:bg-green-600 text-sm text-white font-semibold"
-                                type="submit">Save</button>
+                                type="submit"  @click="modalOpen=false" >Save</button>
                         </div>
                     </form>
+                    
+                    {% if request.user|is_manager %}
+                    <div hx-delete="{{ request.path }}" hx-target="closest .modal">
+                        <div class="mt-4">
+                            <button class="bg-red-500 rounded-full py-1.5 px-4 hover:bg-red-600 text-sm text-white font-semibold"
+                                type="submit" @click="modalOpen=false">Delete</button>
+                        </div>
+                    </div>
+                    {% endif %}
+
 
                 </div>
             </div>

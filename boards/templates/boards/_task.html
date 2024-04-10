@@ -1,5 +1,6 @@
 {% load humanize %}
-<div class="task relative group bg-white shadow p-3 rounded-md text-sm cursor-pointer hover:shadow-lg" id="{{ task.uuid }}">
+<div  class="task relative group bg-white shadow p-3 rounded-md text-sm cursor-pointer hover:shadow-lg" id="{{ task.uuid }}">
+    
     <a href="#" class="absolute inset-0"
         hx-get="{% url 'boards:task_modal' task.uuid %}" hx-swap="beforeend" hx-target="body" hx-trigger="click"></a>
 
@@ -8,7 +9,6 @@
     {% if task.assigned_to %}
         <span class="inline-block bg-blue-600 text-white text-xs px-2 rounded-full uppercase font-semibold tracking-wide">{{ task.assigned_to }}</span>
     {% endif %}
-
     {% if task.time_estimate %}
     <span class="inline-block bg-teal-200 text-teal-800 text-xs px-2 rounded-full uppercase font-semibold tracking-wide">{{task.time_estimate | naturaltime}}</span>
     {% endif %}

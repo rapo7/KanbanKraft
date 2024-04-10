@@ -141,3 +141,5 @@ INTERNAL_IPS = [
 ]
 
 LOGIN_REDIRECT_URL = '/'
+TIME_ZONE = "US/Eastern"
+USE_TZ = True

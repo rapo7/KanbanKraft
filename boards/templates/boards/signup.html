@@ -121,6 +121,10 @@
                             </button>
                         </div>
                     </form>
+                    <div class="mt-12 text-sm font-display font-semibold text-gray-700 text-center">
+                        Already have an account ? <a href="{% url 'login' %}" class="cursor-pointer text-green-600 hover:text-green-800">Log
+                            In</a>
+                    </div>
                     <div class="text-red-500" >
                     {% if form.errors %}
                     <form>

@@ -36,7 +36,7 @@ def create_board(request):
 
     return render(request, "boards/board_form.html", {"form": form})
 
-
+@login_required
 def board(request, board_uuid, partial=False):
     board = get_object_or_404(
         Board.objects.all().prefetch_related("lists__tasks"), uuid=board_uuid
@@ -46,7 +46,7 @@ def board(request, board_uuid, partial=False):
     response["HX-Retarget"] = "#board"
     return response
 
-
+@login_required
 def delete_board(request, board_uuid):
     board = get_object_or_404(Board, uuid=board_uuid)
     print(f"delete_board {board.name}")
@@ -60,7 +60,7 @@ def delete_board(request, board_uuid):
 
 
 
-
+@login_required
 def create_list(request, board_uuid):
     board_ = get_object_or_404(Board, uuid=board_uuid)
     form = ListForm(request.POST or None)
@@ -72,7 +72,7 @@ def create_list(request, board_uuid):
 
     return render(request, "boards/board_form.html", {"form": form})
 
-
+@login_required
 def delete_list(request, board_uuid, list_uuid):
     list = get_object_or_404(List, uuid=list_uuid)
 
@@ -84,7 +84,7 @@ def delete_list(request, board_uuid, list_uuid):
 
 
 
-
+@login_required
 def create_task(request, board_uuid, list_uuid):
     list = get_object_or_404(List, uuid=list_uuid)
     form = TaskForm(request.POST or None)
@@ -97,7 +97,7 @@ def create_task(request, board_uuid, list_uuid):
 
     return render(request, "boards/board_form.html", {"form": form})
 
-
+@login_required
 def edit_task(request, board_uuid, task_uuid):
     task = get_object_or_404(Task, uuid=task_uuid)
     form = TaskForm(request.POST or None, instance=task)
@@ -112,7 +112,7 @@ def edit_task(request, board_uuid, task_uuid):
 
 
 
-
+@login_required
 
 def preserve_order(uuids):
     return Case(
@@ -121,7 +121,7 @@ def preserve_order(uuids):
         output_field=models.IntegerField()
     )
 
-
+@login_required
 @require_POST
 def list_move(request, board_uuid):
     form = ListMoveForm(request.POST)
@@ -134,7 +134,7 @@ def list_move(request, board_uuid):
 
 
 
-
+@login_required
 @require_POST
 def task_move(request, board_uuid):
     form = TaskMoveForm(request.POST)
